@@ -1,8 +1,9 @@
 package models
 
 type StashID struct {
-	StashID  string `db:"stash_id" json:"stash_id"`
-	Endpoint string `db:"endpoint" json:"endpoint"`
+	StashID   string       `db:"stash_id" json:"stash_id"`
+	Endpoint  string       `db:"endpoint" json:"endpoint"`
+	UpdatedAt OptionalTime `db:"updated_at" json:"updated_at,omitempty"`
 }
 
 type UpdateStashIDs struct {

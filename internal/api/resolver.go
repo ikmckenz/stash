@@ -4,9 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
-	"strconv"
-
 	"github.com/stashapp/stash/internal/build"
 	"github.com/stashapp/stash/internal/manager"
 	"github.com/stashapp/stash/pkg/logger"
@@ -14,6 +11,8 @@ import (
 	"github.com/stashapp/stash/pkg/plugin/hook"
 	"github.com/stashapp/stash/pkg/scraper"
 	"github.com/stashapp/stash/pkg/scraper/stashbox"
+	"sort"
+	"strconv"
 )
 
 var (
@@ -105,6 +104,12 @@ func (r *Resolver) Plugin() PluginResolver {
 func (r *Resolver) ConfigResult() ConfigResultResolver {
 	return &configResultResolver{r}
 }
+func (r *Resolver) StashID() StashIDResolver {
+	return &stashIDResolver{r}
+}
+func (r *Resolver) StashIDInput() StashIDInputResolver {
+	return &stashIDInputResolver{r}
+}
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
@@ -117,6 +122,8 @@ type sceneResolver struct{ *Resolver }
 type sceneMarkerResolver struct{ *Resolver }
 type imageResolver struct{ *Resolver }
 type studioResolver struct{ *Resolver }
+type stashIDResolver struct{ *Resolver }
+type stashIDInputResolver struct{ *Resolver }
 
 // movie is group under the hood
 type groupResolver struct{ *Resolver }

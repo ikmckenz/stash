@@ -3,10 +3,9 @@ package api
 import (
 	"context"
 	"fmt"
+	"github.com/99designs/gqlgen/graphql"
 	"strconv"
 	"strings"
-
-	"github.com/99designs/gqlgen/graphql"
 
 	"github.com/stashapp/stash/pkg/models"
 	"github.com/stashapp/stash/pkg/sliceutil/stringslice"
@@ -338,6 +337,12 @@ func (t changesetTranslator) updateStringsBulk(value *BulkUpdateStrings, field s
 func (t changesetTranslator) updateStashIDs(value []models.StashID, field string) *models.UpdateStashIDs {
 	if !t.hasField(field) {
 		return nil
+	}
+	for v := range value {
+		if value[v].UpdatedAt.Value.IsZero() {
+			value[v].UpdatedAt.Null = true
+			value[v].UpdatedAt.Set = false
+		}
 	}
 
 	return &models.UpdateStashIDs{

@@ -263,7 +263,7 @@ func TestScrapedStudio_ToPartial(t *testing.T) {
 		images            = []string{image}
 
 		existingEndpoint = "existingEndpoint"
-		existingStashID  = StashID{"existingStashID", existingEndpoint}
+		existingStashID  = StashID{"existingStashID", existingEndpoint, OptionalTime{}}
 		existingStashIDs = []StashID{existingStashID}
 	)
 

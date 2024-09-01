@@ -421,7 +421,7 @@ type stashIDRepository struct {
 type stashIDs []models.StashID
 
 func (s *stashIDs) Append(o interface{}) {
-	*s = append(*s, *o.(*models.StashID))
+	*s = append(*s, o.(models.StashID))
 }
 
 func (s *stashIDs) New() interface{} {
@@ -429,10 +429,17 @@ func (s *stashIDs) New() interface{} {
 }
 
 func (r *stashIDRepository) get(ctx context.Context, id int) ([]models.StashID, error) {
-	query := fmt.Sprintf("SELECT stash_id, endpoint from %s WHERE %s = ?", r.tableName, r.idColumn)
+	query := fmt.Sprintf("SELECT stash_id, endpoint, updated_at from %s WHERE %s = ?", r.tableName, r.idColumn)
 	var ret stashIDs
-	err := r.query(ctx, query, []interface{}{id}, &ret)
-	return []models.StashID(ret), err
+	err := r.queryFunc(ctx, query, []interface{}{id}, false, func(rows *sqlx.Rows) error {
+		var v stashIDRow
+		if err := rows.StructScan(&v); err != nil {
+			return err
+		}
+		ret.Append(v.resolve())
+		return nil
+	})
+	return ret, err
 }
 
 type filesRepository struct {

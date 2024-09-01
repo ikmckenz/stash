@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/stashapp/stash/pkg/logger"
 	"github.com/stashapp/stash/pkg/models"
@@ -189,6 +190,8 @@ func (g sceneRelationships) stashIDs(ctx context.Context) ([]models.StashID, err
 
 	endpoint := g.result.source.RemoteSite
 
+	currentTime := time.Now()
+
 	// just check if ignored
 	if remoteSiteID == nil || endpoint == "" || !shouldSetSingleValueField(fieldStrategy, false) {
 		return nil, nil
@@ -210,13 +213,9 @@ func (g sceneRelationships) stashIDs(ctx context.Context) ([]models.StashID, err
 
 	for i, stashID := range stashIDs {
 		if endpoint == stashID.Endpoint {
-			// if stashID is the same, then don't set
-			if stashID.StashID == *remoteSiteID {
-				return nil, nil
-			}
-
 			// replace the stash id and return
 			stashID.StashID = *remoteSiteID
+			stashID.UpdatedAt = models.NewOptionalTime(currentTime)
 			stashIDs[i] = stashID
 			return stashIDs, nil
 		}
@@ -224,8 +223,9 @@ func (g sceneRelationships) stashIDs(ctx context.Context) ([]models.StashID, err
 
 	// not found, create new entry
 	stashIDs = append(stashIDs, models.StashID{
-		StashID:  *remoteSiteID,
-		Endpoint: endpoint,
+		StashID:   *remoteSiteID,
+		Endpoint:  endpoint,
+		UpdatedAt: models.NewOptionalTime(currentTime),
 	})
 
 	if sliceutil.SliceSame(originalStashIDs, stashIDs) {
